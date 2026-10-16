@@ -1,7 +1,8 @@
 import { products, categories } from '../../backend/catalog.js'
-import { icon } from './icon.js'
-import { imageUrl, escapeHtml } from './image.js'
-import { button } from './Button.js'
+import '../Style/ProductSection.css'
+import { icon } from './icon.jsx'
+import { imageUrl, escapeHtml } from './image.jsx'
+import { button } from './Button.jsx'
 
 export function renderProductCard(product, state) {
   const wished = state.wishlist.has(product.id)
@@ -18,7 +19,7 @@ export function renderProductCard(product, state) {
     </article>`
 }
 
-export function renderProducts(state) {
+export function renderProducts(state, { animate = false } = {}) {
   const searchTerm = state.search.trim().toLocaleLowerCase()
   const matchingProducts = products.filter(product => {
     const categoryMatches = Boolean(searchTerm) || state.category === 'all' || product.category === state.category
@@ -44,8 +45,8 @@ export function renderProducts(state) {
         <button class="filter-chip ${state.category === 'pets' ? 'selected' : ''}" data-category="pets">For the fur family</button>
       </div>
       ${matchingProducts.length
-        ? `<div class="product-grid">${matchingProducts.map(product => renderProductCard(product, state)).join('')}</div>`
-        : `<div class="empty-state"><span>✳</span><h3>No little things found just yet.</h3><p>Try another search or take a peek at everything.</p>${button('See all the good stuff', { attributes: 'data-category="all"' })}</div>`}
+        ? `<div class="product-grid ${animate ? 'is-entering' : ''}">${matchingProducts.map(product => renderProductCard(product, state)).join('')}</div>`
+        : `<div class="empty-state ${animate ? 'is-entering' : ''}"><span>✳</span><h3>No little things found just yet.</h3><p>Try another search or take a peek at everything.</p>${button('See all the good stuff', { attributes: 'data-category="all"' })}</div>`}
       ${!searchTerm && state.category === 'all' ? `<div class="collection-footnote"><span>✳</span> The best gifts aren’t always for a special occasion. <a href="#make-a-box">Make your own little moment ${icon('arrow', 15)}</a></div>` : ''}
     </section>`
 }

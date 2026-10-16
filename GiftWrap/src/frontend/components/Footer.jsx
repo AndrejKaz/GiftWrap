@@ -1,4 +1,5 @@
-import { icon } from './icon.js'
+import '../Style/Footer.css'
+import { icon } from './icon.jsx'
 
 export function renderFooter() {
   return `

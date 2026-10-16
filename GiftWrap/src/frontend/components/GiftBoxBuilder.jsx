@@ -1,8 +1,9 @@
 import { products, boxSizes } from '../../backend/catalog.js'
 import { currentBox, getProduct } from '../../backend/store.js'
-import { icon } from './icon.js'
-import { imageUrl } from './image.js'
-import { button } from './Button.js'
+import '../Style/GiftBoxBuilder.css'
+import { icon } from './icon.jsx'
+import { imageUrl } from './image.jsx'
+import { button } from './Button.jsx'
 
 export function renderBoxBuilder(state) {
   const box = currentBox()

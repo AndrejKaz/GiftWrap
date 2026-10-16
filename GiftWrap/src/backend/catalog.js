@@ -14,7 +14,7 @@ export const products = [
   { id: 'tiny-artist', name: 'Make-believe building set', brand: 'Happy Campers', price: 35, category: 'kids', kind: 'Toys & make-believe', color: 'lilac', image: 'photo-1599623560574-39d485900c95', badge: 'Make something' },
   { id: 'nap-club', name: 'Nap club cloud bed', brand: 'Soft Spot', price: 64, category: 'pets', kind: 'For sleepy pets', color: 'sage', image: 'photo-1583337130417-3346a1be7dee', badge: 'Extra cozy' },
   { id: 'tiny-feast', name: 'The little treat tin', brand: 'Sunday Pup', price: 19, category: 'pets', kind: 'Treats for good pets', color: 'peach', image: 'photo-1560743641-3914f2c45636', badge: '' },
-  { id: 'parrot-party', name: 'Parrot party perch set', brand: 'Little Current', price: 31, category: 'pets', kind: 'For your parrot', color: 'butter', image: 'photo-1535591273668-578e31182c4f', badge: 'Bird-approved' },
+  { id: 'parrot-party', name: 'Parrot party perch set', brand: 'Little Current', price: 31, category: 'pets', kind: 'For your parrot', color: 'butter', image: 'photo-1552728089-57bdde30beb3', badge: 'Bird-approved' },
 ]
 
 export const categories = [

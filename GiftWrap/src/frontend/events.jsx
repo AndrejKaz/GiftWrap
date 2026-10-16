@@ -1,7 +1,27 @@
 import { currentBox, getProduct, saveState, state } from '../backend/store.js'
-import { fallbackArt as imageFallback } from './components/image.js'
+import { renderProducts } from './components/ProductSection.jsx'
+import { fallbackArt as imageFallback } from './components/image.jsx'
 
 export function attachStorefrontEvents(app, render, showToast) {
+  function selectCategory(category) {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    state.category = category
+    state.search = ''
+    const searchInput = document.querySelector('#search-input')
+    if (searchInput) searchInput.value = ''
+    document.querySelectorAll('.main-nav [data-category]').forEach(link => {
+      link.classList.toggle('active', link.dataset.category === category)
+    })
+
+    const section = document.querySelector('#gifts')
+    if (section) {
+      section.outerHTML = renderProducts(state, { animate: !reducedMotion })
+    } else {
+      render()
+    }
+  }
+
   app.addEventListener('error', event => {
     const image = event.target
     if (image instanceof HTMLImageElement && image.dataset.fallback && !image.dataset.fallbackApplied) {
@@ -12,12 +32,8 @@ export function attachStorefrontEvents(app, render, showToast) {
 
   app.addEventListener('input', event => {
     if (event.target.id !== 'search-input') return
-    const position = event.target.selectionStart
     state.search = event.target.value
-    render()
-    const searchInput = document.querySelector('#search-input')
-    searchInput.focus()
-    searchInput.setSelectionRange(position, position)
+    document.querySelector('#gifts').outerHTML = renderProducts(state)
   })
 
   app.addEventListener('submit', event => {
@@ -34,11 +50,11 @@ export function attachStorefrontEvents(app, render, showToast) {
 
     if (target.matches('[data-category]')) {
       event.preventDefault()
-      state.category = target.dataset.category
-      state.search = ''
       state.drawer = null
-      render()
-      if (state.category !== 'all') {
+      const category = target.dataset.category
+      const shouldScroll = category !== 'all' && !target.closest('.product-filters')
+      selectCategory(category)
+      if (shouldScroll) {
         document.querySelector('#gifts').scrollIntoView({ behavior: 'smooth', block: 'start' })
       }
       return

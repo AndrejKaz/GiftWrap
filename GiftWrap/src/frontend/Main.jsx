@@ -1,14 +1,15 @@
 
+import './Style/Main.css'
 import { loadSavedState, state } from '../backend/store.js'
-import { renderHeader } from './components/Header.js'
-import { renderHero } from './components/Hero.js'
-import { renderCategories } from './components/CategorySection.js'
-import { renderProducts } from './components/ProductSection.js'
-import { renderBoxBuilder } from './components/GiftBoxBuilder.js'
-import { renderLoveNote } from './components/LoveNote.js'
-import { renderFooter } from './components/Footer.js'
-import { renderDrawer } from './components/Drawer.js'
-import { attachStorefrontEvents } from './events.js'
+import { renderHeader } from './components/Header.jsx'
+import { renderHero } from './components/Hero.jsx'
+import { renderCategories } from './components/CategorySection.jsx'
+import { renderProducts } from './components/ProductSection.jsx'
+import { renderBoxBuilder } from './components/GiftBoxBuilder.jsx'
+import { renderLoveNote } from './components/LoveNote.jsx'
+import { renderFooter } from './components/Footer.jsx'
+import { renderDrawer } from './components/Drawer.jsx'
+import { attachStorefrontEvents } from './events.jsx'
 
 export function mountStorefront() {
   const app = document.querySelector('#app')

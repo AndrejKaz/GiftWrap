@@ -1,8 +1,9 @@
-import { icon } from './icon.js'
+import '../Style/Drawer.css'
+import { icon } from './icon.jsx'
 import { getCartItemTotal, getProduct } from '../../backend/store.js'
 import { boxSizes } from '../../backend/catalog.js'
-import { imageUrl, escapeHtml } from './image.js'
-import { button } from './Button.js'
+import { imageUrl, escapeHtml } from './image.jsx'
+import { button } from './Button.jsx'
 
 export function renderDrawer(state) {
   if (!state.drawer) return ''

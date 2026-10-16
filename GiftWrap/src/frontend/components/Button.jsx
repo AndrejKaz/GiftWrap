@@ -1,4 +1,5 @@
-import { icon } from './icon.js'
+import '../Style/Button.css'
+import { icon } from './icon.jsx'
 
 export function button(text, {
   variant = 'dark',

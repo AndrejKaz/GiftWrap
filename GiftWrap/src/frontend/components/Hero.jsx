@@ -1,6 +1,7 @@
-import { icon } from './icon.js'
-import { imageUrl } from './image.js'
-import { button } from './Button.js'
+import '../Style/Hero.css'
+import { icon } from './icon.jsx'
+import { imageUrl } from './image.jsx'
+import { button } from './Button.jsx'
 
 export function renderHero() {
   return `

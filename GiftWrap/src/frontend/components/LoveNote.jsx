@@ -1,5 +1,6 @@
-import { icon } from './icon.js'
-import { imageUrl } from './image.js'
+import '../Style/LoveNote.css'
+import { icon } from './icon.jsx'
+import { imageUrl } from './image.jsx'
 
 export function renderLoveNote() {
   return `

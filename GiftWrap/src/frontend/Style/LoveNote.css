@@ -1,0 +1,19 @@
+.hero h1 em, .builder-copy h2 em, .love-note-copy h2 em { color: var(--coral); font-weight: 500; }
+.love-note { min-height: 390px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 9%; padding-top: 79px; padding-bottom: 82px; }
+.love-note-image { position: relative; height: 310px; }
+.love-note-image img { height: 100%; }
+.love-note-image > span { position: absolute; right: -22px; bottom: 20px; padding: 11px 13px; background: #e8eee0; font-family: var(--serif); font-size: 12px; font-style: italic; transform: rotate(-3deg); }
+.love-note-copy { position: relative; padding: 14px 0; }
+.big-quote { display: block; height: 54px; margin-top: 14px; color: var(--coral); font-family: var(--serif); font-size: 70px; line-height: 1; }
+.love-note-copy h2 { margin: 3px 0 13px; font-family: var(--serif); font-size: clamp(30px, 3.4vw, 43px); font-weight: 500; letter-spacing: -.04em; line-height: 1.2; }
+.love-note-copy > p { max-width: 380px; margin-bottom: 19px; color: #77766d; font-size: 10px; line-height: 1.9; }
+.note-stamp { position: absolute; right: 3px; bottom: 16px; width: 64px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #dfa691; border-radius: 50%; color: #b9654d; font-size: 7px; line-height: 1.25; letter-spacing: .12em; text-align: center; transform: rotate(12deg); }
+.note-stamp b { font-size: 11px; }
+@media (max-width: 600px) {
+.love-note { grid-template-columns: 1fr; gap: 26px; padding-top: 52px; padding-bottom: 56px; }
+.love-note-image { height: 255px; margin-right: 10px; }
+.love-note-image > span { right: -10px; bottom: 12px; font-size: 10px; }
+.love-note-copy h2 { font-size: 35px; }
+.big-quote { margin-top: 7px; }
+.note-stamp { right: 8px; bottom: 2px; width: 54px; height: 54px; font-size: 6px; }
+}

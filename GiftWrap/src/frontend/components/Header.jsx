@@ -1,5 +1,6 @@
-import { icon } from './icon.js'
-import { escapeHtml } from './image.js'
+import '../Style/Header.css'
+import { icon } from './icon.jsx'
+import { escapeHtml } from './image.jsx'
 import { getCartCount } from '../../backend/store.js'
 
 export function renderHeader(state) {

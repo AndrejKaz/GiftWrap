@@ -1,6 +1,7 @@
 import { categories } from '../../backend/catalog.js'
-import { icon } from './icon.js'
-import { imageUrl } from './image.js'
+import '../Style/CategorySection.css'
+import { icon } from './icon.jsx'
+import { imageUrl } from './image.jsx'
 
 export function renderCategories() {
   return `
