@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "hooks": {
+    "userPromptSubmitted": [
+      {
+        "type": "command",
+        "powershell": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts\\capture-agent-log.ps1 -Event userPromptSubmitted",
+        "cwd": ".",
+        "env": {
+          "CAPTURE_MODEL": "Auto (gpt-6-luna)",
+          "CAPTURE_AUTHOR": "AndrejKaz"
+        },
+        "timeoutSec": 30
+      }
+    ],
+    "agentStop": [
+      {
+        "type": "command",
+        "powershell": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts\\capture-agent-log.ps1 -Event agentStop",
+        "cwd": ".",
+        "env": {
+          "CAPTURE_MODEL": "Auto (gpt-6-luna)",
+          "CAPTURE_AUTHOR": "AndrejKaz"
+        },
+        "timeoutSec": 30
+      }
+    ]
+  }
+}
