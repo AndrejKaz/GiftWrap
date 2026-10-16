@@ -4,6 +4,7 @@
 
 - Tool: VS Code using the GitHub Copilot SDK harness.
 - Model selection: `Auto (gpt-6-luna)`, as shown in the model picker; the captured response events identify `gpt-6-luna`.
+- The UI does not expose separate planning and execution model assignments; it reports one Auto-selected model for the agent session.
 - Automatic capture: yes. The Copilot lifecycle hooks run on prompt submission and when the agent stops.
 
 ## Mechanism
@@ -48,6 +49,6 @@ Capture test received. The prompt was recorded as entry 1 in [the session log](<
 
 ## First attempt and limitations
 
-The first pair of canary sessions exposed a Windows stdin encoding issue: the em dash in each prompt was decoded as mojibake. The exchange-count header also remained at zero because the update pattern did not handle CRLF. Those original, failed captures remain unchanged in `.agent-logs/`; they were not edited or deleted. I changed stdin handling to explicit UTF-8 and made the header updates CRLF-aware, then verified the handlers with a disposable transcript and reran both canaries successfully.
+The first pair of canary sessions exposed a Windows stdin encoding issue: the em dash in each prompt was decoded as mojibake. The exchange-count header also remained at zero because the update pattern did not handle CRLF. Those original, failed captures remain unchanged in `.agent-logs/`; they were not edited or deleted. I changed stdin handling to explicit UTF-8 and made the header updates CRLF-aware, then verified the handlers with a disposable transcript and reran both canaries successfully. The GitHub handle was confirmed after the successful canaries, so those raw log headers remain `author: unknown`; subsequent logs use `AndrejKaz`.
 
 This hook was installed after the current conversation had already begun. It does not retroactively capture earlier turns in this conversation; the two canary sessions above demonstrate capture for sessions started after installation.
