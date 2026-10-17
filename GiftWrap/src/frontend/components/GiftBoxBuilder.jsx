@@ -1,8 +1,8 @@
-import { products, boxSizes } from '../../backend/catalog.js'
+import { boxSizes } from '../../backend/catalog.js'
 import { currentBox, getProduct } from '../../backend/store.js'
 import '../Style/GiftBoxBuilder.css'
 import { icon } from './icon.jsx'
-import { imageUrl } from './image.jsx'
+import { imageUrl, escapeHtml } from './image.jsx'
 import { button } from './Button.jsx'
 
 export function renderBoxBuilder(state) {
@@ -30,11 +30,11 @@ export function renderBoxBuilder(state) {
           </div>
           <div class="builder-pick-head"><span>Pick their little things</span><span>${itemCount} / ${box.capacity} in your box</span></div>
           <div class="builder-picks">
-            ${products.map(product => {
+            ${state.products.map(product => {
               const quantity = state.boxItems.filter(id => id === product.id).length
-              return `<button class="builder-pick ${quantity ? 'in-box' : ''}" data-box-add="${product.id}" aria-label="${quantity ? 'Remove' : 'Add'} ${product.name} ${quantity ? 'from' : 'to'} custom box">
-                <span class="pick-mini product-${product.color}"><img src="${imageUrl(product.image, 160)}" data-fallback="${product.id}" alt="" loading="lazy">${quantity ? `<i>${quantity}</i>` : ''}</span>
-                <span class="pick-name">${product.name}</span><span class="pick-price">$${product.price}</span>
+              return `<button class="builder-pick ${quantity ? 'in-box' : ''}" data-box-add="${escapeHtml(product.id)}" aria-label="${quantity ? 'Remove' : 'Add'} ${escapeHtml(product.name)} ${quantity ? 'from' : 'to'} custom box">
+                <span class="pick-mini product-${escapeHtml(product.color)}"><img src="${escapeHtml(imageUrl(product.image, 160))}" data-fallback="${escapeHtml(product.id)}" alt="" loading="lazy">${quantity ? `<i>${quantity}</i>` : ''}</span>
+                <span class="pick-name">${escapeHtml(product.name)}</span><span class="pick-price">$${product.price}</span>
                 <span class="pick-plus">${quantity ? '−' : '+'}</span>
               </button>`
             }).join('')}

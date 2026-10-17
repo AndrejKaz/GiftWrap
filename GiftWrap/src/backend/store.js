@@ -3,18 +3,36 @@ import { boxSizes, products } from './catalog.js'
 export const state = {
   category: 'all',
   search: '',
+  user: null,
+  authLoading: true,
+  authMode: 'login',
+  authBusy: false,
+  authError: '',
+  products,
+  databaseError: '',
+  databaseLoading: false,
   wishlist: new Set(),
   cart: [],
   boxSize: 'medium',
   boxItems: [],
   drawer: null,
+  checkoutOpen: false,
+  checkoutComplete: false,
+  productDetailId: '',
+  productSort: 'recommended',
+}
+
+function getStorageKey() {
+  return state.user?.id ? `littlethings-store:${state.user.id}` : 'littlethings-store'
 }
 
 export function loadSavedState() {
+  state.wishlist = new Set()
+  state.cart = []
   try {
-    const saved = JSON.parse(localStorage.getItem('littlethings-store') || '{}')
+    const saved = JSON.parse(localStorage.getItem(getStorageKey()) || '{}')
     if (Array.isArray(saved.wishlist)) {
-      state.wishlist = new Set(saved.wishlist.filter(id => products.some(product => product.id === id)))
+      state.wishlist = new Set(saved.wishlist.filter(id => state.products.some(product => product.id === id)))
     }
     if (Array.isArray(saved.cart)) {
       state.cart = saved.cart
@@ -28,7 +46,7 @@ export function loadSavedState() {
 
 export function saveState() {
   try {
-    localStorage.setItem('littlethings-store', JSON.stringify({
+    localStorage.setItem(getStorageKey(), JSON.stringify({
       wishlist: [...state.wishlist],
       cart: state.cart,
     }))
@@ -38,7 +56,7 @@ export function saveState() {
 }
 
 export function getProduct(id) {
-  const product = products.find(item => item.id === id)
+  const product = state.products.find(item => item.id === id) ?? products.find(item => item.id === id)
   if (product) return product
 
   const box = boxSizes.find(size => id === `gift-box-${size.id}`)

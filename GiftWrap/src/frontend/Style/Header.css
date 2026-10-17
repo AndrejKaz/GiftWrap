@@ -9,6 +9,10 @@
 .nav-link:hover, .nav-link.active { color: var(--coral); }
 .nav-spark { color: var(--coral); padding-left: 4px; }
 .header-actions { display: flex; align-items: center; gap: 13px; }
+.account-session { max-width: 90px; overflow: hidden; color: #57574f; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.account-sign-out { padding: 6px 0; border: 0; border-bottom: 1px solid #d8d5cc; background: transparent; color: #57574f; font-size: 9px; cursor: pointer; white-space: nowrap; }
+.account-sign-out:hover { color: var(--coral); border-color: var(--coral); }
+.account-sign-out:disabled { opacity: .55; cursor: wait; }
 .search-field { height: 37px; width: clamp(150px, 17vw, 235px); padding: 0 10px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #d8d5cc; color: #77766d; }
 .search-field input { width: 100%; border: 0; outline: none; background: transparent; color: var(--ink); font-size: 10px; min-width: 0; }
 .search-field input::placeholder { color: #8c8b83; }
@@ -36,6 +40,8 @@
 .site-header { padding-inline: 17px; gap: 8px; }
 .wordmark { font-size: 24px; }
 .header-actions { gap: 4px; }
+.account-session { display: none; }
+.account-sign-out { font-size: 8px; }
 .search-field { width: 35px; justify-content: center; padding: 0; border: 0; }
 .search-field input, .search-field kbd { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 .search-field:focus-within { position: absolute; left: 16px; right: 115px; width: auto; height: 42px; padding: 0 10px; background: var(--paper); border: 1px solid var(--line); }

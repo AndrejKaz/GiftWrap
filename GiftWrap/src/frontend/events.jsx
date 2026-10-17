@@ -1,8 +1,12 @@
 import { currentBox, getProduct, saveState, state } from '../backend/store.js'
+import { loadDatabaseCatalog, registerWithUsername, signInWithUsername, signOut } from '../backend/supabase.js'
 import { renderProducts } from './components/ProductSection.jsx'
 import { fallbackArt as imageFallback } from './components/image.jsx'
 
-export function attachStorefrontEvents(app, render, showToast) {
+export function attachStorefrontEvents(app, render, showToast, applySessionUser) {
+  let modalReturnProductId = ''
+  let modalReturnTrigger = 'name'
+
   function selectCategory(category) {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -30,13 +34,142 @@ export function attachStorefrontEvents(app, render, showToast) {
     }
   }, true)
 
-  app.addEventListener('input', event => {
-    if (event.target.id !== 'search-input') return
+  app.addEventListener('wheel', event => {
+    if (!(event.target instanceof Element)) return
+    const grid = event.target.closest('.product-grid')
+    if (!grid || grid.scrollWidth <= grid.clientWidth || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return
+
+    const multiplier = event.deltaMode === WheelEvent.DOM_DELTA_LINE
+      ? 16
+      : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+        ? window.innerHeight
+        : 1
+    const delta = event.deltaY * multiplier
+    if (!delta || (delta < 0 && grid.scrollLeft <= 0) || (delta > 0 && grid.scrollLeft >= grid.scrollWidth - grid.clientWidth)) return
+
+    event.preventDefault()
+    grid.scrollLeft = Math.max(0, Math.min(grid.scrollLeft + delta, grid.scrollWidth - grid.clientWidth))
+  }, { passive: false })
+
+  function addToCart(id, quantity = 1) {
+    const found = state.cart.find(item => item.id === id)
+    if (found) found.quantity += quantity
+    else state.cart.push({ id, quantity })
+    saveState()
+    render()
+    showToast(`${getProduct(id).name} added to your bag ✳`)
+  }
+
+  function updateSearch(event) {
+    if (!(event.target instanceof HTMLInputElement) || event.target.id !== 'search-input') return
     state.search = event.target.value
-    document.querySelector('#gifts').outerHTML = renderProducts(state)
+    const section = document.querySelector('#gifts')
+    if (!section) return
+
+    const scrollX = window.scrollX
+    const scrollY = window.scrollY
+    const nextSection = document.createElement('template')
+    nextSection.innerHTML = renderProducts(state)
+    const next = nextSection.content.querySelector('#gifts')
+    section.querySelector('.product-section-eyebrow').textContent =
+      next.querySelector('.product-section-eyebrow').textContent
+    section.querySelector('#gifts-heading').textContent =
+      next.querySelector('#gifts-heading').textContent
+    const results = section.querySelector('.product-results')
+    results.innerHTML = next.querySelector('.product-results').innerHTML
+    const grid = results.querySelector('.product-grid')
+    if (grid) grid.scrollLeft = 0
+
+    const root = document.documentElement
+    const previousScrollBehavior = root.style.scrollBehavior
+    root.style.scrollBehavior = 'auto'
+    window.scrollTo(scrollX, scrollY)
+    requestAnimationFrame(() => {
+      window.scrollTo(scrollX, scrollY)
+      root.style.scrollBehavior = previousScrollBehavior
+    })
+  }
+
+  function closeDrawer({ restoreFocus = true } = {}) {
+    const wasWishlist = state.drawer === 'wishlist'
+    state.drawer = null
+    render()
+    if (restoreFocus) document.querySelector(wasWishlist ? '.wishlist-open' : '.cart-open')?.focus()
+  }
+
+  app.addEventListener('input', updateSearch)
+  app.addEventListener('search', updateSearch)
+
+  app.addEventListener('change', event => {
+    if (!(event.target instanceof HTMLSelectElement) || event.target.id !== 'product-sort') return
+    state.productSort = event.target.value
+    const input = document.querySelector('#search-input')
+    if (input) updateSearch({ target: input })
+  })
+
+  app.addEventListener('keydown', event => {
+    if (!(event.ctrlKey || event.metaKey) || event.key.toLocaleLowerCase() !== 'k') return
+    if (document.querySelector('[role="dialog"][aria-modal="true"]')) return
+    const searchInput = document.querySelector('#search-input')
+    if (!searchInput) return
+    event.preventDefault()
+    searchInput.focus()
   })
 
   app.addEventListener('submit', event => {
+    if (event.target.matches('[data-checkout-form]')) {
+      event.preventDefault()
+      const form = event.target
+      if (!form.reportValidity()) return
+
+      const cardNumber = String(new FormData(form).get('cardNumber') || '').replace(/\s/g, '')
+      if (cardNumber !== '4242424242424242') {
+        const input = form.elements.cardNumber
+        input.setCustomValidity('Use the demo card number shown above.')
+        input.reportValidity()
+        input.addEventListener('input', () => input.setCustomValidity(''), { once: true })
+        return
+      }
+
+      state.checkoutComplete = true
+      state.cart = []
+      saveState()
+      render()
+      document.querySelector('.checkout-success h2')?.focus()
+      return
+    }
+    if (event.target.matches('[data-auth-form]')) {
+      event.preventDefault()
+      const form = event.target
+      const credentials = Object.fromEntries(new FormData(form))
+      const registering = state.authMode === 'register'
+      if (registering && credentials.password !== credentials.passwordConfirm) {
+        state.authError = 'Those passwords do not match.'
+        render()
+        return
+      }
+
+      state.authBusy = true
+      state.authError = ''
+      render()
+      const authentication = registering
+        ? registerWithUsername(credentials.username, credentials.password)
+        : signInWithUsername(credentials.username, credentials.password)
+
+      authentication.then(async data => {
+        if (!data.token || !data.user) {
+          state.authError = 'The authentication service did not return a session. Check the Supabase Edge Function configuration.'
+          return
+        }
+        await applySessionUser(data.user)
+      }).catch(error => {
+        state.authError = error.message
+      }).finally(() => {
+        state.authBusy = false
+        render()
+      })
+      return
+    }
     if (!event.target.matches('.newsletter')) return
     event.preventDefault()
     const email = new FormData(event.target).get('email')
@@ -46,8 +179,82 @@ export function attachStorefrontEvents(app, render, showToast) {
 
   app.addEventListener('click', event => {
     const target = event.target.closest('button, a, [data-close-drawer]')
+    if (event.target.matches('.product-detail-backdrop')) {
+      closeProductDetails()
+      return
+    }
+    if (event.target.matches('.checkout-backdrop')) {
+      const completed = state.checkoutComplete
+      state.checkoutOpen = false
+      state.checkoutComplete = false
+      state.drawer = completed ? null : 'cart'
+      render()
+      if (completed) document.querySelector('.cart-open')?.focus()
+      else document.querySelector('.checkout-button')?.focus()
+      return
+    }
     if (!target) return
 
+    if (target.matches('[data-auth-mode]')) {
+      state.authMode = target.dataset.authMode
+      state.authError = ''
+      render()
+      document.querySelector('#auth-username')?.focus()
+      return
+    }
+    if (target.matches('[data-sign-out]')) {
+      state.authBusy = true
+      signOut()
+        .then(() => applySessionUser(null))
+        .catch(error => showToast(`Could not sign out. ${error.message}`))
+        .finally(() => {
+          state.authBusy = false
+          render()
+        })
+      return
+    }
+    if (target.matches('[data-retry-catalog]')) {
+      state.databaseError = ''
+      state.databaseLoading = true
+      render()
+      loadDatabaseCatalog()
+        .then(products => {
+          state.products = products
+        })
+        .catch(error => {
+          state.databaseError = error.message
+        })
+        .finally(() => {
+          state.databaseLoading = false
+          render()
+        })
+      return
+    }
+    if (target.matches('[data-product-details]')) {
+      modalReturnProductId = target.dataset.productDetails
+      modalReturnTrigger = target.classList.contains('product-image-details') ? 'image' : 'name'
+      state.productDetailId = modalReturnProductId
+      render()
+      document.querySelector('.product-detail-close')?.focus()
+      return
+    }
+    if (target.matches('[data-close-product-details]')) {
+      closeProductDetails()
+      return
+    }
+    if (target.matches('[data-detail-add]')) {
+      const id = target.dataset.detailAdd
+      state.productDetailId = ''
+      addToCart(id)
+      return
+    }
+    if (target.matches('[data-clear-search]')) {
+      state.search = ''
+      const input = document.querySelector('#search-input')
+      if (input) input.value = ''
+      if (input) updateSearch({ target: input })
+      return
+    }
     if (target.matches('[data-category]')) {
       event.preventDefault()
       state.drawer = null
@@ -92,8 +299,17 @@ export function attachStorefrontEvents(app, render, showToast) {
       return
     }
     if (target.hasAttribute('data-close-drawer')) {
-      state.drawer = null
+      closeDrawer({ restoreFocus: !target.dataset.scroll })
+      return
+    }
+    if (target.matches('[data-close-checkout]')) {
+      const completed = state.checkoutComplete
+      state.checkoutOpen = false
+      state.checkoutComplete = false
+      state.drawer = completed ? null : 'cart'
       render()
+      if (completed) document.querySelector('.cart-open')?.focus()
+      else document.querySelector('.checkout-button')?.focus()
       return
     }
     if (target.matches('[data-quantity]')) {
@@ -141,7 +357,11 @@ export function attachStorefrontEvents(app, render, showToast) {
       return
     }
     if (target.matches('.checkout-button')) {
-      showToast('Lovely choice. Checkout is coming very soon ✳')
+      state.drawer = null
+      state.checkoutComplete = false
+      state.checkoutOpen = true
+      render()
+      document.querySelector('#checkout-name')?.focus()
       return
     }
     if (target.matches('.mobile-menu')) {
@@ -159,22 +379,54 @@ export function attachStorefrontEvents(app, render, showToast) {
   })
 
   document.addEventListener('keydown', event => {
-    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+    const dialog = document.querySelector('[role="dialog"][aria-modal="true"]')
+    if (dialog && event.key === 'Tab') {
+      const focusable = [...dialog.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+        .filter(element => element.getClientRects().length > 0)
+      if (focusable.length) {
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        if (event.shiftKey && (document.activeElement === first || !dialog.contains(document.activeElement))) {
+          event.preventDefault()
+          last.focus()
+        } else if (!event.shiftKey && (document.activeElement === last || !dialog.contains(document.activeElement))) {
+          event.preventDefault()
+          first.focus()
+        }
+      }
+    }
+    if (!dialog && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
       event.preventDefault()
       document.querySelector('#search-input')?.focus()
     }
-    if (event.key === 'Escape' && state.drawer) {
+    if (event.key === 'Escape' && state.productDetailId) {
+      closeProductDetails()
+      return
+    }
+    if (event.key === 'Escape' && (state.drawer || state.checkoutOpen)) {
+      const completed = state.checkoutComplete
+      const checkoutWasOpen = state.checkoutOpen
+      const drawerWasOpen = Boolean(state.drawer)
+      const wishlistWasOpen = state.drawer === 'wishlist'
       state.drawer = null
+      state.checkoutOpen = false
+      state.checkoutComplete = false
+      if (checkoutWasOpen && !completed) state.drawer = 'cart'
       render()
+      if (completed) document.querySelector('.cart-open')?.focus()
+      else if (checkoutWasOpen) document.querySelector('.checkout-button')?.focus()
+      else if (drawerWasOpen) document.querySelector(wishlistWasOpen ? '.wishlist-open' : '.cart-open')?.focus()
     }
   })
-}
 
-function addToCart(id, quantity = 1) {
-  const found = state.cart.find(item => item.id === id)
-  if (found) found.quantity += quantity
-  else state.cart.push({ id, quantity })
-  saveState()
-  render()
-  showToast(`${getProduct(id).name} added to your bag ✳`)
+  function closeProductDetails() {
+    const productId = modalReturnProductId
+    const triggerClass = modalReturnTrigger === 'image' ? 'product-image-details' : 'product-name-button'
+    state.productDetailId = ''
+    modalReturnProductId = ''
+    render()
+    const trigger = [...document.querySelectorAll('[data-product-details]')]
+      .find(element => element.dataset.productDetails === productId && element.classList.contains(triggerClass))
+    trigger?.focus()
+  }
 }

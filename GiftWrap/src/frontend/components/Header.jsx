@@ -16,6 +16,8 @@ export function renderHeader(state) {
       </nav>
       <div class="header-actions">
         <label class="search-field">${icon('search', 18)}<input id="search-input" type="search" placeholder="Find a little something" value="${escapeHtml(state.search)}" aria-label="Search gifts"><kbd>⌘ K</kbd></label>
+        <span class="account-session">${escapeHtml(state.user?.user_name || 'Account')}</span>
+        <button class="account-sign-out" type="button" data-sign-out ${state.authBusy ? 'disabled' : ''}>Sign out</button>
         <button class="icon-button wishlist-open" aria-label="Open wishlist" title="Wishlist">${icon('heart')}<span class="count-badge ${state.wishlist.size ? '' : 'is-empty'}">${state.wishlist.size}</span></button>
         <button class="icon-button cart-open" aria-label="Open shopping bag" title="Shopping bag">${icon('bag')}<span class="count-badge ${getCartCount() ? '' : 'is-empty'}">${getCartCount()}</span></button>
       </div>

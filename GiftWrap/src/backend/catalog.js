@@ -15,6 +15,18 @@ export const products = [
   { id: 'nap-club', name: 'Nap club cloud bed', brand: 'Soft Spot', price: 64, category: 'pets', kind: 'For sleepy pets', color: 'sage', image: 'photo-1583337130417-3346a1be7dee', badge: 'Extra cozy' },
   { id: 'tiny-feast', name: 'The little treat tin', brand: 'Sunday Pup', price: 19, category: 'pets', kind: 'Treats for good pets', color: 'peach', image: 'photo-1560743641-3914f2c45636', badge: '' },
   { id: 'parrot-party', name: 'Parrot party perch set', brand: 'Little Current', price: 31, category: 'pets', kind: 'For your parrot', color: 'butter', image: 'photo-1552728089-57bdde30beb3', badge: 'Bird-approved' },
+  { id: 'bedtime-stories', name: 'Bedtime stories to keep', brand: 'Small Hours Press', price: 26, category: 'kids', kind: 'Books & bedtime reading', color: 'blue', image: 'photo-1544947950-fa07a98d237f', badge: 'Little readers' },
+  { id: 'bookish-bookmarks', name: 'Bookish bookmark set', brand: 'Paper Day', price: 14, category: 'adults', kind: 'Books & stationery', color: 'lilac', image: 'photo-1512820790803-83ca734da794', badge: 'For book lovers' },
+  { id: 'cloud-pup-bed', name: 'Cloud nine dog bed', brand: 'Sunday Pup', price: 72, category: 'pets', kind: 'Beds for dogs', color: 'sage', image: 'photo-1583337130417-3346a1be7dee', badge: 'Extra cozy' },
+  { id: 'kitty-cave-bed', name: 'The cozy cat cave bed', brand: 'Soft Spot', price: 68, category: 'pets', kind: 'Beds for cats', color: 'peach', image: 'photo-1514888286974-6c03e2ca1dba', badge: 'Cat approved' },
+  { id: 'reading-journal', name: 'One more chapter journal', brand: 'Paper Day', price: 21, category: 'adults', kind: 'Books & stationery', color: 'butter', image: 'photo-1455390582262-044cdead277a', badge: 'For book lovers' },
+  { id: 'rainy-day-puzzle', name: 'Rainy day picture puzzle', brand: 'Happy Campers', price: 29, category: 'kids', kind: 'Games & puzzles', color: 'blue', image: 'photo-1606509036992-664d5a9fae69', badge: 'Rainy day favorite' },
+  { id: 'little-paintbox', name: 'Little hands paintbox', brand: 'Mud & Bloom', price: 25, category: 'kids', kind: 'Arts & crafts', color: 'lilac', image: 'photo-1513364776144-60967b0f800f', badge: 'Make something' },
+  { id: 'morning-mug', name: 'The slow morning mug', brand: 'Good Measure', price: 28, category: 'adults', kind: 'Mugs & everyday things', color: 'peach', image: 'photo-1514228742587-6b1558fcca3d', badge: 'A daily favorite' },
+  { id: 'garden-posy', name: 'A little garden posy', brand: 'Mud & Bloom', price: 36, category: 'adults', kind: 'Flowers & little luxuries', color: 'sage', image: 'photo-1490750967868-88aa4486c946', badge: 'Fresh pick' },
+  { id: 'walkies-gift-set', name: 'Ready for walkies set', brand: 'Sunday Pup', price: 39, category: 'pets', kind: 'Dog walks & play', color: 'butter', image: 'photo-1548199973-03cce0bbc87b', badge: 'Pup-approved' },
+  { id: 'catnip-play-kit', name: 'Catnip playtime kit', brand: 'Little Current', price: 23, category: 'pets', kind: 'Cat toys & play', color: 'lilac', image: 'photo-1573865526739-10659fec78a5', badge: 'For curious cats' },
+  { id: 'teddy-storybook', name: 'Teddy’s tiny storybook', brand: 'Small Hours Press', price: 19, category: 'kids', kind: 'Books & comics', color: 'butter', image: 'photo-1512820790803-83ca734da794', badge: 'Bedtime favorite' },
 ]
 
 export const categories = [
